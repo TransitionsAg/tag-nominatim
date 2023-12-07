@@ -70,11 +70,11 @@ impl Client {
     /// Get [`Place`]s from a search query.
     ///
     /// [Documentation](https://nominatim.org/release-docs/develop/api/Search/)
-    pub async fn search(&self, query: impl AsRef<str>) -> Result<Vec<Place>, reqwest::Error> {
+    pub async fn search(&self, query: impl Into<String>) -> Result<Vec<Place>, reqwest::Error> {
         let mut url = self.base_url.clone();
         url.set_query(Some(&format!(
             "addressdetails=1&extratags=1&q={}&format=json",
-            query.as_ref().replace(' ', "+")
+            query.into().replace(' ', "+")
         )));
 
         let mut headers = HeaderMap::new();
@@ -99,8 +99,8 @@ impl Client {
     /// [Documentation](https://nominatim.org/release-docs/develop/api/Reverse/)
     pub async fn reverse(
         &self,
-        latitude: impl AsRef<str>,
-        longitude: impl AsRef<str>,
+        latitude: impl Into<String>,
+        longitude: impl Into<String>,
         zoom: Option<u8>,
     ) -> Result<Place, reqwest::Error> {
         let mut url = self.base_url.join("reverse").unwrap();
@@ -109,16 +109,16 @@ impl Client {
             Some(zoom) => {
                 url.set_query(Some(&format!(
                     "addressdetails=1&extratags=1&format=json&lat={}&lon={}&zoom={}",
-                    latitude.as_ref().replace(' ', ""),
-                    longitude.as_ref().replace(' ', ""),
+                    latitude.into().replace(' ', ""),
+                    longitude.into().replace(' ', ""),
                     zoom
                 )));
             }
             None => {
                 url.set_query(Some(&format!(
                     "addressdetails=1&extratags=1&format=json&lat={}&lon={}",
-                    latitude.as_ref().replace(' ', ""),
-                    longitude.as_ref().replace(' ', ""),
+                    latitude.into().replace(' ', ""),
+                    longitude.into().replace(' ', ""),
                 )));
             }
         }
@@ -143,8 +143,15 @@ impl Client {
     /// Return [`Place`]s from a list of OSM Node, Way, or Relations.
     ///
     /// [Documentation](https://nominatim.org/release-docs/develop/api/Lookup/)
-    pub async fn lookup(&self, queries: Vec<&str>) -> Result<Vec<Place>, reqwest::Error> {
-        let queries = queries.join(",");
+    pub async fn lookup(
+        &self,
+        queries: Vec<impl Into<String>>,
+    ) -> Result<Vec<Place>, reqwest::Error> {
+        let queries: String = queries
+            .into_iter()
+            .map(Into::<String>::into)
+            .collect::<Vec<String>>()
+            .join(",");
 
         let mut url = self.base_url.join("lookup").unwrap();
         url.set_query(Some(&format!(
