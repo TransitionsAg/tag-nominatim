@@ -44,8 +44,16 @@ impl Client {
     }
 
     /// Check the status of the nominatim server.
+    /// ```
+    /// # use tag_nominatim::{Client, IdentificationMethod};
     ///
-    /// [Documentation](https://nominatim.org/release-docs/develop/api/Status/)
+    /// let client = Client::new(IdentificationMethod::from_user_agent(
+    ///     "Example Application Name",
+    /// ));
+    /// # tokio_test::block_on(async {
+    /// assert_eq!(client.status().await.unwrap().message, "OK");
+    /// # })
+    /// ```
     pub async fn status(&self) -> Result<Status, reqwest::Error> {
         let mut url = self.base_url.join("status.php").unwrap();
         url.set_query(Some("format=json"));
@@ -69,7 +77,16 @@ impl Client {
 
     /// Get [`Place`]s from a search query.
     ///
-    /// [Documentation](https://nominatim.org/release-docs/develop/api/Search/)
+    /// ```
+    /// # use tag_nominatim::{Client, IdentificationMethod};
+    ///
+    /// let client = Client::new(IdentificationMethod::from_user_agent(
+    ///     "Example Application Name",
+    /// ));
+    /// # tokio_test::block_on(async {
+    /// assert_eq!(client.search("statue of liberty").await.unwrap().len(), 4);
+    /// # })
+    /// ```
     pub async fn search(&self, query: impl Into<String>) -> Result<Vec<Place>, reqwest::Error> {
         let mut url = self.base_url.clone();
         url.set_query(Some(&format!(
@@ -96,7 +113,19 @@ impl Client {
 
     /// Generate a [`Place`] from latitude and longitude.
     ///
-    /// [Documentation](https://nominatim.org/release-docs/develop/api/Reverse/)
+    /// ```
+    /// # use tag_nominatim::{Client, IdentificationMethod};
+    ///
+    /// let client = Client::new(IdentificationMethod::from_user_agent(
+    ///     "Example Application Name",
+    /// ));
+    /// # tokio_test::block_on(async {
+    /// assert_eq!(
+    ///     client.reverse("40.689249", "-74.044500", None).await.unwrap().display_name,
+    ///     "Statue of Liberty, Flagpole Plaza, Manhattan Community Board 1, Manhattan, New York County, City of New York, New York, 10004, United States"
+    /// );
+    /// # })
+    /// ```
     pub async fn reverse(
         &self,
         latitude: impl Into<String>,
@@ -142,7 +171,19 @@ impl Client {
 
     /// Return [`Place`]s from a list of OSM Node, Way, or Relations.
     ///
-    /// [Documentation](https://nominatim.org/release-docs/develop/api/Lookup/)
+    /// ```
+    /// # use tag_nominatim::{Client, IdentificationMethod};
+    ///
+    /// let client = Client::new(IdentificationMethod::from_user_agent(
+    ///     "Example Application Name",
+    /// ));
+    /// # tokio_test::block_on(async {
+    /// assert_eq!(
+    ///     client.lookup(vec!["R146656", "W50637691"]).await.unwrap().first().unwrap().display_name,
+    ///     "Manchester, Greater Manchester, England, United Kingdom"
+    /// );
+    /// # })
+    /// ```
     pub async fn lookup(
         &self,
         queries: Vec<impl Into<String>>,

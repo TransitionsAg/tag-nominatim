@@ -1,8 +1,11 @@
 [package]
-name = "nominatim"
-version = "0.3.5"
+name = "tag_nominatim"
+version = "0.1.0"
 edition = "2021"
-authors = ["Grant Handy <granthandy@proton.me>"]
+authors = [
+    "Grant Handy <granthandy@proton.me>",
+    "VIAL Sébastien <svial@transitions.ag>",
+]
 repository = "https://github.com/grantshandy/nominatim-rs"
 documentation = "https://docs.rs/nominatim"
 description = "Bindings to the reverse geocoding API powered by openstreetmap."
@@ -21,3 +24,4 @@ url = "2.4"
 
 [dev-dependencies]
 tokio = { version = "1.20", features = ["full"] }
+tokio-test = "0.4.3"
